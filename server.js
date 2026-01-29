@@ -12,20 +12,24 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoutes'); // WEEK 2 - NEW
+const userRoutes = require('./routes/userRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const dashboardRoutes = require('./routes/dashboard');
 
 // Mount routes
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes); // WEEK 2 - NEW
+app.use('/api/users', userRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/dashboard', dashboardRoutes);
@@ -72,24 +76,5 @@ app.use((err, req, res, next) => {
   });
 });
 
-// server.js mein
-
-
-// backend/server.js mein dekho
-app.use(cors({
-  origin: '*',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
-}));
-
-// Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log('✅ Task routes mounted at /api/tasks');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log(`🚀 Server running in ${process.env.NODE_ENV || 'production'} mode`);
-  console.log(`📍 http://localhost:${PORT}`);
-  console.log(`🔐 Auth endpoints: http://localhost:${PORT}/api/auth`);
-  console.log(`👥 User endpoints: http://localhost:${PORT}/api/users`);
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-});
+// ✅ EXPORT FOR VERCEL (NO app.listen!)
+module.exports = app;
