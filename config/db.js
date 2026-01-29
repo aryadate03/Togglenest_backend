@@ -1,8 +1,21 @@
 const mongoose = require('mongoose');
 
+let isConnected = false;
+
 const connectDB = async () => {
+  // Reuse existing connection
+  if (isConnected) {
+    console.log('✅ Using existing MongoDB connection');
+    return;
+  }
+
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
+    
+    isConnected = true;
     
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('✅ MongoDB Connected Successfully!');
@@ -14,7 +27,10 @@ const connectDB = async () => {
     console.error('❌ MongoDB Connection FAILED!');
     console.error(`Error: ${error.message}`);
     console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    process.exit(1);
+    // Don't exit in serverless - just log the error
+    if (process.env.NODE_ENV !== 'production') {
+      process.exit(1);
+    }
   }
 };
 
